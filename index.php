@@ -417,6 +417,10 @@
 		
 		<?php
 		
+		session_start();
+		
+		$_SESSION['acceso']=true;
+		
 		if(!file_exists('img')){
 			mkdir('img', 0777, true);
 		}

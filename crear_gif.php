@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 date_default_timezone_set('Europe/Madrid');
 
@@ -171,7 +172,10 @@ if ($comprobacion[0] != 'error') {
             header("Content-disposition: attachment; filename=Output/$archivo.gif");
             header("Content-type: MIME");
             readfile("Output/$archivo.gif");
-            unlink('Output/' . $archivo . '.gif');
+			
+			if(isset($_SESSION['acceso']) && $_SESSION['acceso']){
+				            unlink('Output/' . $archivo . '.gif');
+			}
 
             print '<h2 name="imagen">' . date("Y") . "_" . date("d") . "_" . date("m") . "_" . date("H") . "-" . date("i") . "-" . date("s") . ".gif" . '</h2>';
         }
