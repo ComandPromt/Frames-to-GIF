@@ -197,7 +197,9 @@ if($num_imagenes<=170){
 				$altofinal = 480;
 			}
 			
-			redimensionarJPG($anchofinal, $altofinal, "img");
+			// Redimensionar a 640*480 si la imagen supera estas medidas
+			
+			//redimensionarJPG($anchofinal, $altofinal, "img");
 			
 			if (count($imagenes) > 1) {
 				require "src/GifCreator/AnimGif.php";
