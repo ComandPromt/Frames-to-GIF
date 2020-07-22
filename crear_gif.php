@@ -194,9 +194,11 @@ if($num_imagenes<=170){
 $borrar = showFiles("img/");
 
 if ($num_imagenes > 0) {
+	
     for ($x = 0; $x < count($borrar); $x++) {
-       // unlink("img/" . $borrar[$x]);
+        unlink("img/" . $borrar[$x]);
     }
+	
 }
 
 header('Location:index.php');
