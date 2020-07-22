@@ -3,51 +3,53 @@
 date_default_timezone_set('Europe/Madrid');
 
 function comprobar_formatos($path){
-	
+
     $formatos = array(".jpg", "jpeg", ".png");
-	
+
     $dir = opendir($path);
-	
+
     $files = array();
-	
-	 $files =showFiles($path . '/');
-	 
+
     while ($current = readdir($dir)) {
 
         if ($current != "." && $current != "..") {
 
-            if (is_dir($path ."/".$current)) {
-
-                $files =showFiles($path ."/". $current . '/');
-				
-            } else {
-                if ($files[0] != 'error') {
-                    if (!in_array(substr($current, -4), $formatos)) {
-                        $files[0] = 'error';
-                    }
+            if (!is_dir($path . $current)) {
+          
+                if (!in_array(substr($current, -4), $formatos)) {
+                    $files[0] = 'error';
                 }
-            }
+
+           }
         }
     }
-	
-	sort($files);
-	
-    return $files;
+
+    if(count($files)==0){
+            return true;
+    }
+
+    else{
+        return false;
+    }
+
 }
 
 function redimensionarJPG($max_ancho, $max_alto, $ruta){
-	
+
     $imagenes = check_images_ext($ruta, "jpg");
+
     $calidad = 100;
-	
+
     for ($x = 0; $x < count($imagenes); $x++) {
-		
+
         $salida = $ruta . "/" . $imagenes[$x];
-		
+
         if (substr($imagenes[$x], -4, 1) == ".") {
-			
+
             $img_original = imagecreatefromjpeg("./" . $ruta . "/" . $imagenes[$x]);
+
             list($ancho, $alto) = getimagesize("./" . $ruta . "/" . $imagenes[$x]);
+
             //Se calcula ancho y alto de la imagen final
             $x_ratio = $max_ancho / $ancho;
             $y_ratio = $max_alto / $alto;
@@ -60,100 +62,67 @@ function redimensionarJPG($max_ancho, $max_alto, $ruta){
 }
 
 function check_images_ext($path, $extension){
-	
     $dir = opendir($path);
     $files = array();
-	
     while ($current = readdir($dir)) {
-		
         if ($current != "." && $current != "..") {
-			
             if (is_dir($path . $current)) {
                 showFiles($path . $current . '/');
-            }
-			
-			else {
-				
+            } else {
                 if (substr($current, -3) == $extension) {
                     $files[] = $current;
                 }
             }
         }
     }
-	
 	sort($files);
-	
     return $files;
 }
 
 function showFiles($path){
-	
     $dir = opendir($path);
-	
     $files = array();
-	
     while ($current = readdir($dir)) {
-
         if ($current != "." && $current != "..") {
-			
             if (is_dir($path . $current)) {
                 showFiles($path . $current . '/');
-            }
-			
-			else {
-				
+            } else {
                 if (substr($current, -4, 1) == "." || substr($current, -3, 1) == "." || substr($current, -5, 1) == ".") {
-                
-				 $files[] = $current;
+                    $files[] = $current;
                 }
             }
         }
     }
-	
 	sort($files);
-	
     return $files;
 }
 
 function check_images($path){
-	
     $dir = opendir($path);
-	
     $files = array();
-	
     while ($current = readdir($dir)) {
-		
         if ($current != "." && $current != "..") {
-			
             if (is_dir($path . $current)) {
                 showFiles($path . $current . '/');
-            }
-
-			else {
+            } else {
                 $files[] = $current;
             }
         }
     }
-	
 	sort($files);
-	
     return $files;
 }
 
 function jpeg_jpg(array $imagenes, $ruta){
-	
     for ($x = 0; $x < count($imagenes); $x++) {
-		
-        if (substr($current, -4) == "jpeg") {
+        if (substr($imagenes[$x], -4) == "jpeg") {
             rename($ruta . "/" . $imagenes, $ruta . "/" . substr($imagenes, 0, -4) . ".jpg");
         }
     }
 }
 
 function png_a_jpg($ruta){
-	
     $imagenes = check_images_ext($ruta, "png");
-	
     for ($x = 0; $x < count($imagenes); $x++) {
         $jpg = $ruta . "/" . substr($imagenes[$x], 0, -3) . "jpg";
         $image = imagecreatefrompng($ruta . "/" . $imagenes[$x]);
@@ -169,17 +138,21 @@ if($num_imagenes<=170){
 	
 	$comprobacion = comprobar_formatos("img");
 
-	if ($comprobacion[0] != 'error') {
-		
-		$imagenes = check_images("img");
-		jpeg_jpg($imagenes, "img");
-		png_a_jpg("img");
-		$imagenes = check_images_ext("img", "jpg");
+	if ($comprobacion) {
+
+        $imagenes = check_images("img");
+        
+        jpeg_jpg($imagenes, "img");
+        
+        png_a_jpg("img");
+        
+        $imagenes = check_images_ext("img", "jpg");
+        
 		$ancho = array();
 		$alto = array();
 		
 		if ($imagenes != null && $imagenes != "" || check_images_ext("img", "png") != null && check_images_ext("img", "png") != "") {
-	
+		
 			for ($x = 0; $x < count($imagenes); $x++) {
 				$imagen = getimagesize("img/" . $imagenes[$x]);
 				$ancho[] = $imagen[0];
@@ -197,8 +170,6 @@ if($num_imagenes<=170){
 				$altofinal = 480;
 			}
 			
-			// Redimensionar a 640*480 si la imagen supera estas medidas
-			
 			//redimensionarJPG($anchofinal, $altofinal, "img");
 			
 			if (count($imagenes) > 1) {
@@ -214,7 +185,6 @@ if($num_imagenes<=170){
 					->save('Output/' . $archivo . '.gif');
 			}
 		}
-		
 		else {
 			print '<h1 name="salida">Folder empty</h1>';
 		}
@@ -224,9 +194,8 @@ if($num_imagenes<=170){
 $borrar = showFiles("img/");
 
 if ($num_imagenes > 0) {
-	
     for ($x = 0; $x < count($borrar); $x++) {
-        unlink("img/" . $borrar[$x]);
+       // unlink("img/" . $borrar[$x]);
     }
 }
 
